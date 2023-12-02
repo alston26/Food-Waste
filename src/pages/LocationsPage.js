@@ -3,13 +3,13 @@ import { MapContainer, TileLayer, Marker, Popup } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import Header from '../components/Header';
 
-import customPinImg from '../icon.jpeg';
+import customPinImg from '../newmammothpointer.png';
 import L from 'leaflet';
 
 const customIcon = new L.Icon({
   iconUrl: customPinImg,
-  iconSize: [25, 41], // Size of the icon
-  iconAnchor: [12, 41], // Point of the icon which will correspond to marker's location
+  iconSize: [45,45], // Size of the icon
+  iconAnchor: [34, 30], // Point of the icon which will correspond to marker's location
   popupAnchor: [1, -34], // Point from which the popup should open relative to the iconAnchor
 });
 
@@ -29,8 +29,13 @@ function LocationsPage() {
     { name: 'King Hall', coords: [42.36935125414417, -72.51306479508955] },
     { name: 'Frost Library', coords: [42.371825118927525, -72.51699544261398] },
     // ... more locations ...
+    { name: 'Seeley Mudd', coords: [42.36974472810023, -72.51628836758711] },
+    { name: 'Webster', coords: [42.369793964774196, -72.51763511410714] },
+    { name: 'Appleton', coords: [42.3702535052077, -72.51794889216279] },
+    { name: 'South', coords: [42.37058379781472, -72.5181377143553] },
+    { name: 'Science Centre', coords: [42.37100061398313, -72.51329429368063] },
   ];
-
+  
 
   // Handle form input changes
   const handleInputChange = (e) => {
@@ -103,68 +108,82 @@ function LocationsPage() {
 
       {/* Right column - Form and Table */}
       <div class="bg-white p-4">
-        {/* Form */}
-        {/* ... existing form code here ... */}
-        {/* Replace the location input with a select */}
-        <select name="location" value={formData.location} onChange={handleInputChange} required>
-          <option value="">Select Location</option>
-          {sampleLocations.map((loc, index) => (
-            <option key={index} value={loc.name}>{loc.name}</option>
-          ))}
-        </select>
-        {/* ... rest of the form ... */}
+  {/* Form */}
+  {/* ... existing form code here ... */}
+  {/* Replace the location input with a select */}
 
-        {/* Table/List of Posts */}
-        {/* ... existing list/table code here ... */}
-        <div>
-          <h1>Food Leftover Posts</h1>
-          <form onSubmit={handleFormSubmit}>
-            <input
-              type="text"
-              name="eventName"
-              placeholder="Event Name"
-              value={formData.eventName}
-              onChange={handleInputChange}
-              required
-            />
-            <input
-              type="text"
-              name="location"
-              placeholder="Location"
-              value={formData.location}
-              onChange={handleInputChange}
-              required
-            />
-            <input
-              type="text"
-              name="floor"
-              placeholder="Floor"
-              value={formData.floor}
-              onChange={handleInputChange}
-              required
-            />
-            <textarea
-              name="foodDescription"
-              placeholder="Food Description"
-              value={formData.foodDescription}
-              onChange={handleInputChange}
-              required
-            />
-            <button type="submit">Post</button>
-          </form>
+  {/* ... rest of the form ... */}
 
-          <h2>Posted Events</h2>
-          <ul>
-            {posts.map((post, index) => (
-              <li key={index}>
-                <strong>{post.eventName}</strong> at {post.location} Floor: {post.floor} - {post.foodDescription}
-                <br />
-                Time Elapsed: {Math.min(Math.floor((Date.now() - post.timestamp) / 60000), 120)} minutes
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
+  {/* Table/List of Posts */}
+  <div>
+    <h1 class="text-xl font-semibold text-gray-700">Food Leftover Posts</h1>
+    <form onSubmit={handleFormSubmit} class="mt-4">
+      <input
+        type="text"
+        name="eventName"
+        placeholder="Event Name"
+        value={formData.eventName}
+        onChange={handleInputChange}
+        required
+        class="w-full p-2 mb-2 border border-gray-300 rounded-md"
+      />
+
+      {/* Replace the location text input with a select */}
+      <select
+        name="location"
+        value={formData.location}
+        onChange={handleInputChange}
+        required
+        class="block w-full p-2 mb-2 border border-gray-300 bg-white rounded-md shadow-sm focus:border-indigo-300 focus:ring focus:ring-indigo-200 focus:ring-opacity-50"
+      >
+        <option value="">Select Location</option>
+        {sampleLocations.map((loc, index) => (
+          <option key={index} value={loc.name}>{loc.name}</option>
+        ))}
+      </select>
+
+      <input
+        type="text"
+        name="floor"
+        placeholder="Floor"
+        value={formData.floor}
+        onChange={handleInputChange}
+        required
+        class="w-full p-2 mb-2 border border-gray-300 rounded-md"
+      />
+
+      <textarea
+        name="foodDescription"
+        placeholder="Food Description"
+        value={formData.foodDescription}
+        onChange={handleInputChange}
+        required
+        class="w-full p-2 mb-2 border border-gray-300 rounded-md"
+      />
+
+      <button
+        type="submit"
+        class="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:bg-blue-700"
+      >
+        Post
+      </button>
+    </form>
+
+    <h2 class="mt-6 text-lg font-semibold text-gray-700">Posted Events</h2>
+    <ul class="list-disc pl-5 mt-2">
+      {posts.map((post, index) => (
+        <li key={index} class="mt-1">
+          <strong>{post.eventName}</strong> at {post.location} Floor: {post.floor} - {post.foodDescription}
+          <br />
+          <span class="text-sm text-gray-600">
+            Time Elapsed: {Math.min(Math.floor((Date.now() - post.timestamp) / 60000), 120)} minutes
+          </span>
+        </li>
+      ))}
+    </ul>
+  </div>
+</div>
+
     </div>
     </div>
   );
