@@ -23,6 +23,7 @@ function LocationsPage() {
     location: '',
     floor: '',
     foodDescription: '',
+    people: '',
   });
 
   const sampleLocations = [
@@ -33,8 +34,34 @@ function LocationsPage() {
     { name: 'Webster', coords: [42.369793964774196, -72.51763511410714] },
     { name: 'Appleton', coords: [42.3702535052077, -72.51794889216279] },
     { name: 'South', coords: [42.37058379781472, -72.5181377143553] },
-    { name: 'Science Centre', coords: [42.37100061398313, -72.51329429368063] },
+    { name: 'Science Center', coords: [42.37100061398313, -72.51329429368063] },
   ];
+  
+  const exportToCSV = () => {
+    let csvContent = "data:text/csv;charset=utf-8,";
+    const headers = ["Event Name", "Location", "Floor", "Food Description", "People", "Time Elapsed"];
+    csvContent += headers.join(",") + "\r\n";
+    posts.forEach(post => {
+      const row = [
+        post.eventName,
+        post.location,
+        post.floor,
+        post.foodDescription,
+        post.people || 'N/A',  // Assuming 'people' can be optional
+        Math.min(Math.floor((Date.now() - post.timestamp) / 60000), 120) + " minutes"
+      ];
+      csvContent += row.join(",") + "\r\n";
+    });
+  
+    // Create a link and trigger the download
+    const encodedUri = encodeURI(csvContent);
+    const link = document.createElement("a");
+    link.setAttribute("href", encodedUri);
+    link.setAttribute("download", "posts_data.csv");
+    document.body.appendChild(link); // Required for FF
+    link.click();
+    document.body.removeChild(link);
+  }
   
 
   // Handle form input changes
@@ -49,7 +76,7 @@ function LocationsPage() {
     // Add new post to posts array
     setPosts([...posts, formData]);
     // Reset form
-    setFormData({ eventName: '', location: '', foodDescription: '' });
+    setFormData({ eventName: '', location: '', foodDescription: '', people: ''});
   };
 
   const handleFormSubmit = (e) => {
@@ -62,7 +89,7 @@ function LocationsPage() {
         timestamp: Date.now()  // Record the current time
       };
       setPosts([...posts, newPost]);
-      setFormData({ eventName: '', location: '', floor: '', foodDescription: '' });
+      setFormData({ eventName: '', location: '', floor: '', foodDescription: '', people: ''});
     } else {
       console.error("Location is not selected or invalid");
     }
@@ -88,7 +115,7 @@ function LocationsPage() {
     <div>
       <Header title="Main Page" />
       <div class="grid grid-cols-2">
-      <div class="bg-white p-4" style={{ height: '400px' }}>
+      <div class="bg-white p-4" style={{ height: '700px' }}>
         <MapContainer center={[42.370953284987834, -72.51685520456492]} zoom={17} style={{ height: '100%' }}>
           <TileLayer
             url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -145,7 +172,7 @@ function LocationsPage() {
       <input
         type="text"
         name="floor"
-        placeholder="Floor"
+        placeholder="Floor/Room Number"
         value={formData.floor}
         onChange={handleInputChange}
         required
@@ -154,33 +181,68 @@ function LocationsPage() {
 
       <textarea
         name="foodDescription"
-        placeholder="Food Description"
+        placeholder="Description"
         value={formData.foodDescription}
         onChange={handleInputChange}
         required
         class="w-full p-2 mb-2 border border-gray-300 rounded-md"
       />
 
+      <input
+        type="text"
+        name="people"
+        placeholder="Number of People (Optional: we are gathering data!)"
+        value={formData.people}
+        onChange={handleInputChange}
+        class="w-full p-2 mb-2 border border-gray-300 rounded-md"
+      />
+
       <button
         type="submit"
-        class="px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:bg-blue-700"
+        class="mt-2 px-4 py-2 text-white bg-blue-500 rounded hover:bg-blue-700 focus:outline-none focus:bg-blue-700"
       >
         Post
       </button>
     </form>
 
-    <h2 class="mt-6 text-lg font-semibold text-gray-700">Posted Events</h2>
-    <ul class="list-disc pl-5 mt-2">
+    <h1 class="text-xl mt-4 mb-4 font-semibold text-gray-700">Posted Events</h1>
+    <div class="relative overflow-x-auto shadow-md sm:rounded-lg">
+  <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
+    <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
+      <tr>
+        <th scope="col" class="px-6 py-3">Event Name</th>
+        <th scope="col" class="px-6 py-3">Location</th>
+        <th scope="col" class="px-6 py-3">Floor</th>
+        <th scope="col" class="px-6 py-3">Food Description</th>
+        <th scope="col" class="px-6 py-3">Time Elapsed</th>
+      </tr>
+    </thead>
+    <tbody>
       {posts.map((post, index) => (
-        <li key={index} class="mt-1">
-          <strong>{post.eventName}</strong> at {post.location} Floor: {post.floor} - {post.foodDescription}
-          <br />
-          <span class="text-sm text-gray-600">
-            Time Elapsed: {Math.min(Math.floor((Date.now() - post.timestamp) / 60000), 120)} minutes
-          </span>
-        </li>
+        <tr key={index} class="bg-white border-b dark:bg-gray-800 dark:border-gray-700">
+          <th scope="row" class="px-6 py-4 font-medium text-gray-900 whitespace-nowrap dark:text-white">
+            {post.eventName}
+          </th>
+          <td class="px-6 py-4">
+            {post.location}
+          </td>
+          <td class="px-6 py-4">
+            {post.floor}
+          </td>
+          <td class="px-6 py-4">
+            {post.foodDescription}
+          </td>
+          <td class="px-6 py-4">
+            {Math.min(Math.floor((Date.now() - post.timestamp) / 60000), 120)} minutes
+          </td>
+        </tr>
       ))}
-    </ul>
+    </tbody>
+  </table>
+</div>
+<button onClick={exportToCSV} class="px-4 py-2 mt-4 text-white bg-green-500 rounded hover:bg-green-700 focus:outline-none">
+  Export to CSV
+</button>
   </div>
 </div>
 
